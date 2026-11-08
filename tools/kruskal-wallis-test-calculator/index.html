@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Kruskal Wallis test calculator, rank based H statistic in your browser</title>
+ <meta name="description" content="Kruskal Wallis test calculator for three or more groups. Tie corrected H, chi-square p value, eta squared, and Dunn pairwise tests with Holm adjusted p values.">
+ <meta name="robots" content="index, follow">
+ <link rel="canonical" href="https://abwex.com/tools/kruskal-wallis-test-calculator/">
+ <meta property="og:title" content="Kruskal Wallis test calculator | ABWex">
+ <meta property="og:description" content="Kruskal Wallis test calculator for three or more groups. Tie corrected H, chi-square p value, eta squared, and Dunn pairwise tests with Holm adjusted p values.">
+ <meta property="og:url" content="https://abwex.com/tools/kruskal-wallis-test-calculator/">
+ <meta property="og:type" content="website">
+ <meta property="og:site_name" content="ABWex">
+ <meta name="twitter:card" content="summary">
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="/assets/style.css?v=67278759">
+ <style>
+/* Kruskal Wallis test page. /assets/style.css does the work. These rules fill the gaps for
+   this page: two text areas, the result cards, one check table and the reading rhythm. The
+   colors, fonts and spacing values are the variables and values of /assets/style.css. */
+.mn .explainer-section { padding-top: 40px; }
+.mn .explainer-section h2 { margin-bottom: 16px; }
+.mn .explainer-section h3 { margin: 24px 0 8px; font-size: 1.05rem; }
+.mn .explainer-section p,
+.mn .explainer-section ul { margin-bottom: 16px; }
+.mn .explainer-section ul { padding-left: 24px; }
+.mn .explainer-section li { margin-bottom: 8px; }
+.mn .explainer-section code { font-family: var(--font-display); background: var(--bg-card); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; overflow-wrap: anywhere; }
+.mn .explainer-section a,
+.mn .last-updated a { overflow-wrap: anywhere; }
+.mn .last-updated { padding-top: 40px; }
+.mn .last-updated p + p { margin-top: 16px; }
+.mn .mn-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Calculator. The site stylesheet covers number inputs only, so the text area gets the
+   same declarations here. A text area accepts pasted lists in any separator format. */
+.mn textarea {
+  width: 100%;
+  min-height: 88px;
+  background: var(--bg-input, #1a1a2e);
+  border: 1px solid var(--border, rgba(255,255,255,0.1));
+  border-radius: 6px;
+  color: var(--text, #e0e0e0);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  padding: 10px 12px;
+  resize: vertical;
+}
+.mn textarea:focus { outline: 2px solid var(--accent, #14B8A6); outline-offset: 1px; }
+.mn textarea[aria-invalid="true"] { border-color: var(--red, #EF4444); }
+.mn .input-label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.92rem; }
+.mn .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 18px; }
+.mn .result-card { background: var(--bg-card); border: 1px solid var(--border, rgba(255,255,255,0.1)); border-radius: 8px; padding: 14px 16px; }
+.mn .result-card .rv { font-family: var(--font-display); font-size: 1.35rem; margin: 4px 0 2px; overflow-wrap: anywhere; }
+.mn .result-card .rl { font-size: 0.875rem; color: var(--text-dim, #9ca3af); }
+.mn .mn-note { font-size: 0.88rem; color: var(--text-dim, #9ca3af); margin-bottom: 12px; }
+.mn .mn-notice { background: rgba(239,68,68,.08); border-left: 3px solid var(--red, #EF4444); padding: 10px 14px; border-radius: 0 6px 6px 0; }
+.mn .check-table { width: 100%; border-collapse: collapse; margin: 12px 0 4px; font-size: 0.9rem; }
+.mn .check-table th, .mn .check-table td { border: 1px solid var(--border, rgba(255,255,255,0.1)); padding: 8px 10px; text-align: left; overflow-wrap: normal; }
+.mn .check-table td + td { white-space: nowrap; }
+.mn .check-table th { background: var(--bg-card); font-weight: 600; }
+.mn .table-wrap { overflow-x: auto; }
+@media (max-width: 640px) { .mn .check-table { font-size: 0.875rem; } }
+.mn .mn-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.pow-strip .pow-label, .pow-strip .pow-strip-inner a { font-size: 0.75rem; }
+ </style>
+</head>
+<body>
+ <header>
+ <div class="container header-inner">
+ <a href="/" class="logo">AB<span>Wex</span></a>
+ <button class="mobile-toggle" aria-label="Menu"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M3 6h16M3 11h16M3 16h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></button>
+ <nav>
+ <a href="/">Calculator</a>
+ <a href="/tools/" class="active">Tools</a>
+ <a href="/answers/">Answers</a>
+ <a href="/guides/">Guides</a>
+ <a href="/blog/">Blog</a>
+ <div class="nav-right">
+ <a href="https://zovo.one/pricing?utm_source=abwex&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank" rel="noopener">Go Pro </a>
+ <a href="https://zovo.one/tools?utm_source=abwex&amp;utm_medium=nav&amp;utm_campaign=tools" class="nav-zovo">Zovo Tools</a>
+ </div>
+ </nav>
+ </div>
+ </header>
+
+ <main class="container mn"><h1>Kruskal Wallis test calculator</h1><p>Paste three or more independent groups of observations. The script ranks every value across all groups together, computes the Kruskal Wallis H statistic with the standard correction for ties, and reports the upper tail p value of the chi-square distribution with k minus 1 degrees of freedom. Everything runs in your browser, nothing is uploaded.</p><h2 id="tool-h" class="mn-sr">Calculator</h2><form id="kw-form"><fieldset><legend>Groups, one group per box, one number per line</legend><p class="mn-note" id="kw-hint">Separate the values with spaces, commas, semicolons or line breaks. Use a point as the decimal mark. A decimal comma or a thousands separator splits a number, 4,2 is read as the two values 4 and 2.</p><div id="kw-groups"><label>Group A<textarea aria-label="Group A values" spellcheck="false">4.2
+4.6
+4.9
+4.4
+4.8</textarea></label><label>Group B<textarea aria-label="Group B values" spellcheck="false">3.3
+3.7
+4.1
+3.5
+3.9</textarea></label><label>Group C<textarea aria-label="Group C values" spellcheck="false">5.1
+5.5
+5.3
+5.4
+5.2</textarea></label></div><button type="button" id="kw-add" class="btn btn-secondary">Add a group</button> <button type="button" id="kw-remove" class="btn btn-secondary">Remove last group</button> <button type="submit" class="btn btn-primary">Calculate</button></fieldset><div id="kw-error" role="alert"></div></form><section aria-live="polite"><div id="kw-out"><p>Enter your data and press Calculate. The script computes the ranks, the H statistic, the tie corrected H, the degrees of freedom and the p value from the values you entered.</p></div></section><section class="explainer-section">
+ <h2>What the test answers</h2><p>The Kruskal Wallis test is a rank based method for comparing two or more independent samples of equal or different sizes <a href="https://en.wikipedia.org/wiki/Kruskal%E2%80%93Wallis_test">(Wikipedia, Kruskal Wallis test)</a>. This calculator takes three or more groups. SciPy states that it tests the null hypothesis that the population median of all of the groups are equal <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.kruskal.html">(SciPy kruskal documentation)</a>. The NIST Dataplot reference states the alternative as at least one of the populations tends to yield larger observations than at least one of the other populations <a href="https://www.itl.nist.gov/div898/software/dataplot/refman1/auxillar/kruskwal.htm">(NIST Dataplot reference)</a>. NIST describes the procedure as a nonparametric test for comparing population medians that assumes underlying continuous distributions <a href="https://www.itl.nist.gov/div898/handbook/prc/section4/prc41.htm">(NIST Engineering Statistics Handbook)</a>.</p><p>A significant H tells you the groups are not all the same. It does not tell you which pair differs, it does not prove one group causes higher values, and a non significant H does not show the groups are equal. Kruskal and Wallis introduced the rank based statistic in their 1952 paper 'Use of ranks in one-criterion variance analysis', Journal of the American Statistical Association, 47(260), pages 583 to 621 <a href="https://api.crossref.org/works/10.1080/01621459.1952.10483441">(Kruskal and Wallis, Journal of the American Statistical Association, 1952)</a>.</p></section>
+<section class="explainer-section">
+ <h2>The formula the script uses</h2><p>Rank all N observations together, averaging ranks for ties. Then</p><p><code>H = 12 / (N(N+1)) * Σ Rᵢ²/nᵢ − 3(N+1)</code></p><p>where Rᵢ is the sum of ranks in group i and nᵢ its sample size. When ties are present the statistic is divided by</p><p><code>C = 1 − Σ(tⱼ³ − tⱼ)/(N³ − N)</code></p><p>where tⱼ is the size of tie group j <a href="https://en.wikipedia.org/wiki/Kruskal%E2%80%93Wallis_test">(Wikipedia, Kruskal Wallis test)</a>. H approximately follows a chi-square distribution with k minus 1 degrees of freedom under the null, provided the sample sizes are not too small, say more than 4 in every group <a href="https://www.itl.nist.gov/div898/handbook/prc/section4/prc41.htm">(NIST Engineering Statistics Handbook)</a>. The p value is the upper tail probability of that chi-square distribution. NIST notes that the rejection region of the test is one sided, because only a large H rejects the null hypothesis <a href="https://www.itl.nist.gov/div898/handbook/prc/section4/prc41.htm">(NIST Engineering Statistics Handbook)</a>. The SciPy documentation gives a typical rule that each sample must have at least 5 measurements <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.kruskal.html">(SciPy kruskal documentation)</a>.</p></section>
+<section class="explainer-section">
+ <h2>Effect size and pairwise tests</h2><p>The page reports eta2[H] = (H - k + 1)/(N - k) and epsilon2 = H/(N - 1). The rstatix documentation gives both formulas and the bands 0.01 to below 0.06 small, 0.06 to below 0.14 moderate, and 0.14 or more large for eta2[H] <a href="https://rpkgs.datanovia.com/rstatix/reference/kruskal_effsize.html">(rstatix kruskal_effsize documentation)</a>. The page sets a negative eta2[H] to 0, as rstatix does.</p><p>The pairwise table uses the Dunn (1964) z test on mean ranks with the tie correction, as scikit-posthocs does <a href="https://scikit-posthocs.readthedocs.io/en/latest/generated/scikit_posthocs.posthoc_dunn.html">(scikit-posthocs posthoc_dunn documentation)</a>. The Holm column is the step-down method using Bonferroni adjustments <a href="https://www.statsmodels.org/stable/generated/statsmodels.stats.multitest.multipletests.html">(statsmodels multipletests documentation)</a>. The page does not compute an exact p value for small samples.</p></section>
+<section class="explainer-section">
+ <h2>Assumptions</h2><p>The NIST handbook states that the test assumes that the variables have underlying continuous distributions <a href="https://www.itl.nist.gov/div898/handbook/prc/section4/prc41.htm">(NIST Engineering Statistics Handbook)</a>. The SciPy documentation states that the test works on 2 or more independent samples, which may have different sizes <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.kruskal.html">(SciPy kruskal documentation)</a>. Independence is the one this calculator cannot check for you. Each subject should appear once, in one group only.</p></section>
+<section class="explainer-section">
+ <h2>Worked example, computed on this page</h2><p>The defaults in the form above are 15 made-up values in three groups. They only show how the page works. They are not the NIST example and not data of this site. Group A holds 4.2, 4.6, 4.9, 4.4 and 4.8. Group B holds 3.3, 3.7, 4.1, 3.5 and 3.9. Group C holds 5.1, 5.5, 5.3, 5.4 and 5.2. Press Calculate and the script prints the size of each group, H, the tie correction, the degrees of freedom, the p value, two effect sizes and the Dunn pairwise table. For these defaults SciPy 1.13.1 gives H = 12.5 and p = 0.0019304541362277095, and the page gives H = 12.500000 and p = 0.001930. Change any number and the output panel changes, because the script computes each result from the values in the boxes.</p></section>
+<section class="explainer-section">
+ <h2>How it compares to the alternatives</h2><p>Wikipedia names the one-way analysis of variance (ANOVA) as the parametric equivalent of the Kruskal Wallis test, and states that the test extends the Mann-Whitney U test, which compares only two groups <a href="https://en.wikipedia.org/wiki/Kruskal%E2%80%93Wallis_test">(Wikipedia, Kruskal Wallis test)</a>. For two groups of raw values, use the <a href="/tools/mann-whitney-u-test-calculator/">Mann-Whitney U test calculator</a>. For a one-sample, two-sample or paired t-test, use the <a href="/tools/t-test-calculator/">t-test calculator</a>. If your outcome is a count per category and not a raw value, use the <a href="/tools/chi-square-test-calculator.html">chi-square test calculator</a> or the <a href="/tools/fisher-freeman-halton-calculator/">Fisher Freeman Halton exact test</a>.</p></section>
+<section class="explainer-section">
+ <h2>Where these numbers come from</h2><p>Every result in the output panel is computed by the page script from the values you paste in. The only results typed into this text are the SciPy and page values of the worked example above. The page fetches no dataset and sends no value anywhere. The calculation runs in JavaScript in your browser. The ranking and the H formula follow the NIST Engineering Statistics Handbook <a href="https://www.itl.nist.gov/div898/handbook/prc/section4/prc41.htm">(NIST Engineering Statistics Handbook)</a>. The tie correction C is the formula in the Wikipedia article on the test <a href="https://en.wikipedia.org/wiki/Kruskal%E2%80%93Wallis_test">(Wikipedia, Kruskal Wallis test)</a>. SciPy documents its kruskal statistic as the H statistic, corrected for ties, with a p value from the chi-square distribution, so you can check the page against it <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.kruskal.html">(SciPy kruskal documentation)</a>. The source code for this site is open and MIT licensed at <a href="https://github.com/theluckystrike/abwex.com">github.com/theluckystrike/abwex.com</a>, so you can read the routine behind every published number.</p></section>
+<section class="explainer-section">
+ <h2>Questions</h2><h3>When is the sample too small for the chi-square approximation?</h3><p>The approximation degrades with small samples. The NIST handbook gives n above 4 per group as the working condition for the chi-square approximation <a href="https://www.itl.nist.gov/div898/handbook/prc/section4/prc41.htm">(NIST Engineering Statistics Handbook)</a>. As a working rule, treat the asymptotic p value with suspicion below five observations per group, and say so in any writeup.</p><h3>Why did my H change after I edited one value?</h3><p>Ranks are computed across all groups jointly. Changing one value can shift many ranks, so H is not a per group quantity. The output panel prints the size, the rank sum and the mean rank of each group, so you can check the ranks.</p><h3>Does a small p value mean group A beats group B?</h3><p>No. A p value is the probability of seeing data this extreme if the null hypothesis is true, it is not the probability that any variant is better, and the omnibus test does not identify which pair differs.</p></section>
+<section class="explainer-section">
+ <h2>Disclaimers</h2><div class="disclaimers"><p>Results are statistical estimates and not business or financial advice.</p><p>The Kruskal Wallis test assumes independent samples. Count each visitor once, in one group only.</p><p>A p value is the probability of seeing data this extreme if the null hypothesis is true, it is not the probability that the variant is better.</p><p>A statistically significant difference is not the same as a lift that is worth shipping.</p><p>The worked example uses 15 made-up values that illustrate the calculation, not observed customer data.</p></div></section>
+<div class="last-updated"><p>By Michael Lip, builder and maintainer of ABWex, open source at <a href="https://github.com/theluckystrike/abwex.com">github.com/theluckystrike/abwex.com</a>. <a href="https://zovo.one">Profile</a>.</p><p>ABWex is a free A/B test statistics calculator from Zovo Tools. The calculation runs in your browser in JavaScript. The page does not send the numbers that you enter to a server. <span style="font-size:.875rem">Updated 2026-11-08</span>.</p></div>
+
+  <!-- Internal Content Discovery -->
+ <section class="content-discovery" style="max-width:960px;margin:3rem auto;padding:0 1rem;">
+ <style>
+        .content-discovery h2 { text-align:center; margin-bottom:2rem; }
+        .content-discovery .disc-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:2rem; margin-bottom:2.5rem; }
+        .content-discovery .disc-group h3 { font-size:1.1rem; margin-bottom:0.75rem; color:var(--accent, #14B8A6); border-bottom:1px solid var(--border, #333); padding-bottom:0.5rem; }
+        .content-discovery .disc-group ul { list-style:none; padding:0; margin:0; }
+        .content-discovery .disc-group li { margin-bottom:0.4rem; }
+        .content-discovery .disc-group a { color:var(--text, #e0e0e0); text-decoration:none; font-size:0.9rem; }
+        .content-discovery .disc-group a:hover { color:var(--accent, #14B8A6); text-decoration:underline; }
+      .mn > h1 { margin: 48px 0 16px; }
+.mn #kw-form fieldset { min-width: 0; background: var(--bg-card); border: 1px solid var(--border, rgba(255,255,255,0.1)); border-radius: 8px; padding: 20px 24px 24px; margin: 24px 0 16px; }
+.mn #kw-form legend { float: left; width: 100%; margin-bottom: 14px; font-family: var(--font-display); font-weight: 700; }
+.mn #kw-groups label { display: block; font-weight: 500; font-size: 0.92rem; }
+.mn #kw-groups textarea { display: block; margin: 6px 0 14px; }
+.mn #kw-error:not(:empty) { background: rgba(239,68,68,.08); border-left: 3px solid var(--red, #EF4444); padding: 10px 14px; border-radius: 0 6px 6px 0; margin-bottom: 12px; }
+</style>
+ <h2>Explore ABWex</h2>
+ <div class="disc-grid">
+ <div class="disc-group">
+ <h3>Testing Tools</h3>
+ <ul>
+ <li><a href="/tools/sample-size-calculator.html">Sample Size Calculator</a></li>
+ <li><a href="/tools/p-value-calculator.html">P-Value Calculator</a></li>
+ <li><a href="/tools/chi-square-test.html">Chi-Square Test</a></li>
+ <li><a href="/tools/confidence-interval-calculator.html">Confidence Interval Calculator</a></li>
+ <li><a href="/tools/bayesian-ab-testing.html">Bayesian A/B Testing</a></li>
+ </ul>
+ </div>
+ <div class="disc-group">
+ <h3>Answers</h3>
+ <ul>
+ <li><a href="/answers/ab-test-sample-size-calculator.html">A/B Test Sample Size Calculator</a></li>
+ <li><a href="/answers/is-my-ab-test-significant.html">Is My A/B Test Significant?</a></li>
+ <li><a href="/answers/how-long-to-run-ab-test.html">How Long to Run an A/B Test</a></li>
+ </ul>
+ </div>
+ <div class="disc-group">
+ <h3>Research</h3>
+ <ul>
+ <li><a href="/research/ab-test-duration-calculator.html">A/B Test Duration Calculator</a></li>
+ <li><a href="/research/ab-test-mistakes.html">A/B Test Mistakes</a></li>
+ </ul>
+ </div>
+ <div class="disc-group">
+ <h3>Guides</h3>
+ <ul>
+ <li><a href="/guides/chi-square-test-guide.html">Chi-Square Test Explained</a></li>
+ </ul>
+ </div>
+ </div>
+ </section>
+ </main>
+<footer class="site-footer">
+ <div class="footer-inner">
+ <div class="footer-brand">Zovo Tools</div>
+ <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+ <a href="https://zovo.one/pricing?utm_source=abwex&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime, $99 once</a>
+ <div class="footer-copy">© 2026 <a href="https://zovo.one/lifetime?utm_source=abwex&amp;utm_medium=footer&amp;utm_campaign=tools">Zovo</a></div>
+ </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+ <div class="zovo-network-inner">
+ <h3 class="zovo-network-title">Explore More Tools</h3>
+ <div class="zovo-network-links">
+ <a href="https://b2berp.com">B2BERP, Business Tools</a>
+ <a href="https://bugbountyreality.com">BugBountyReality, Security</a>
+ <a href="https://claudflow.com">ClaudFlow, Workflows</a>
+ <a href="https://claudkit.com">ClaudKit, API Tools</a>
+ <a href="https://dismissticket.com">DismissTicket, Support</a>
+ <a href="https://enhio.com">Enhio, Text Tools</a>
+ <a href="https://epochpilot.com">EpochPilot, Timestamps</a>
+ <a href="https://gen8x.com">Gen8X, Color Tools</a>
+ <a href="https://gpt0x.com">GPT0X, AI Models</a>
+ <a href="https://heytensor.com">HeyTensor, ML Tools</a>
+ <a href="https://ingredientcalculator.com">IngredientCalc, Recipes</a>
+ <a href="https://invokebot.com">InvokeBot, Webhooks</a>
+ <a href="https://kappafy.com">Kappafy, JSON</a>
+ <a href="https://kappakit.com">KappaKit, Dev Toolkit</a>
+ <a href="https://kickllm.com">KickLLM, LLM Costs</a>
+ <a href="https://krzen.com">Krzen, Image Tools</a>
+ <a href="https://lochbot.com">LochBot, Security</a>
+ <a href="https://lockml.com">LockML, ML Security</a>
+ <a href="https://ml0x.com?utm_source=abwex&amp;utm_medium=nav&amp;utm_campaign=tools">ML0X, ML Basics</a>
+ <a href="https://ml3x.com">ML3X, Matrix Math</a>
+ <a href="https://pictureeditor.net">PictureEditor, Image Editing</a>
+ <a href="https://recipetool.net">RecipeTool, Cooking</a>
+ <a href="https://viryd.com">Viryd, Dev Tools</a>
+ <a href="https://tg.zovo.one/">Tiny Telegram Tools, Telegram Bots</a>
+ </div>
+ </div>
+</nav>
+
+<div class="pow-strip">
+ <div class="pow-strip-inner">
+ <span class="pow-label" style="font-size:0.75rem">By the same builder:</span>
+ <a href="https://github.com/theluckystrike" rel="nofollow" style="font-size:0.75rem">GitHub, theluckystrike</a>
+ <a href="https://www.belikenative.com" rel="nofollow" style="font-size:0.75rem">BeLikeNative, Grammar AI</a>
+ <a href="https://earlythunder.com" rel="nofollow" style="font-size:0.75rem">EarlyThunder, Dev Blog</a>
+ <a href="https://bugbountyreality.com" rel="nofollow" style="font-size:0.75rem">Bug Bounty Reality</a>
+ <a href="https://zovo.one/lifetime?utm_source=abwex&amp;utm_medium=inline&amp;utm_campaign=tools" rel="nofollow" style="font-size:0.75rem">Zovo, AI Dev Tools</a>
+ </div>
+</div>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebPage","name":"Kruskal Wallis test calculator","url":"https://abwex.com/tools/kruskal-wallis-test-calculator/","author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one/about/michael-lip"},"datePublished":"2026-11-08","dateModified":"2026-11-08","description":"Rank based Kruskal Wallis H test calculator for three or more independent groups, computed in the browser."},{"@type":"WebApplication","name":"ABWex Kruskal Wallis test calculator","applicationCategory":"ScientificApplication","operatingSystem":"Any","url":"https://abwex.com/tools/kruskal-wallis-test-calculator/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ABWex","item":"https://abwex.com/"},{"@type":"ListItem","position":2,"name":"Kruskal Wallis test calculator","item":"https://abwex.com/tools/kruskal-wallis-test-calculator/"}]},{"@type":"Person","name":"Michael Lip","url":"https://zovo.one","description":"Builder and maintainer of ABWex, part of Zovo Tools."}]}</script><script>
+/* ABWex Kruskal Wallis test calculator. MIT licensed, github.com/theluckystrike/abwex.com.
+   H with the tie correction and the chi-square upper tail p value, as scipy.stats.kruskal.
+   Effect sizes eta2[H] = (H - k + 1)/(N - k), floored at 0, and epsilon2 = H/(N - 1), as rstatix kruskal_effsize.
+   Dunn (1964) pairwise z with the tie correction, Holm step-down adjusted p values.
+   The script makes no network request. Each loop has a fixed upper limit. */
+(function () {
+  var MAXG = 12, MAXN = 5000;
+  function lgamma(z) { var g = [76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5]; var x = z - 1, y = x + 5.5, s = 1.000000000190015, i; for (i = 0; i < 6; i += 1) { s += g[i] / (x + i + 1); } return 0.5 * Math.log(2 * Math.PI) + (x + 0.5) * Math.log(y) - y + Math.log(s); }
+  /* upper regularized gamma Q(a, x), computed directly so that a small p value does not round to 0 */
+  function gammaQ(a, x) {
+    var i, ap, sum, del, b, c, d, h, an, dl;
+    if (x <= 0) { return 1; }
+    if (x < a + 1) { ap = a; sum = 1 / a; del = sum; for (i = 1; i < 1000; i += 1) { ap += 1; del *= x / ap; sum += del; if (Math.abs(del) < Math.abs(sum) * 1e-15) { break; } } return 1 - sum * Math.exp(-x + a * Math.log(x) - lgamma(a)); }
+    b = x + 1 - a; c = 1e300; d = 1 / b; h = d;
+    for (i = 1; i < 1000; i += 1) { an = -i * (i - a); b += 2; d = an * d + b; if (Math.abs(d) < 1e-300) { d = 1e-300; } c = b + an / c; if (Math.abs(c) < 1e-300) { c = 1e-300; } d = 1 / d; dl = d * c; h *= dl; if (Math.abs(dl - 1) < 1e-15) { break; } }
+    return Math.exp(-x + a * Math.log(x) - lgamma(a)) * h;
+  }
+  function chi2sf(x, df) { return gammaQ(df / 2, x / 2); }
+  function normsf2(z) { return chi2sf(z * z, 1); } /* normal p value, both tails of z */
+  function fmtP(p) { return p < 0.0001 ? p.toExponential(3) : p.toFixed(6); }
+  function fmtN(v) { return String(Number(v.toPrecision(12))); }
+  var NUM = /^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/;
+  function parse(txt, gi) {
+    var lines = txt.trim().split(/\n+/).filter(function (l) { return l.trim(); }), toks, out = [], i, v; if (lines.length > 0 && lines.every(function (l) { return /^\s*[+-]?\d+,\d+\s*$/.test(l); })) { return { err: 'Group ' + String.fromCharCode(65 + gi) + ' looks like it uses a decimal comma. Write 4.2, not 4,2.' }; } toks = txt.trim().split(/[\s,;]+/).filter(Boolean);
+    if (toks.length > MAXN) { return { err: 'Group ' + String.fromCharCode(65 + gi) + ' has more than ' + MAXN + ' values.' }; }
+    for (i = 0; i < toks.length; i += 1) {
+      if (!NUM.test(toks[i])) { return { err: 'Group ' + String.fromCharCode(65 + gi) + ' has a value that is not a number, ' + toks[i].slice(0, 20) + '.' }; }
+      v = Number(toks[i]);
+      if (!isFinite(v) || Math.abs(v) > 1e9) { return { err: 'Group ' + String.fromCharCode(65 + gi) + ' has a value outside -1000000000 to 1000000000.' }; }
+      out.push(v === 0 ? 0 : v);
+    }
+    if (out.length === 0) { return { err: 'Group ' + String.fromCharCode(65 + gi) + ' has no values. Each group needs at least 1 value.' }; }
+    return { v: out };
+  }
+  function quant(s, q) { var h = (s.length - 1) * q, lo = Math.floor(h), hi = Math.ceil(h); return s[lo] + (h - lo) * (s[hi] - s[lo]); } /* linear, numpy default */
+  function compute(groups) {
+    var all = [], gid = [], k = groups.length, N, ord, ranks, i, j, t, tieSum = 0, R = [], n = [], H = 0, C, Hc, a, b;
+    for (i = 0; i < k; i += 1) { n.push(groups[i].length); R.push(0); for (j = 0; j < groups[i].length; j += 1) { all.push(groups[i][j]); gid.push(i); } }
+    N = all.length; ord = all.map(function (v, ix) { return ix; }).sort(function (p, q) { return all[p] - all[q]; });
+    ranks = new Array(N); i = 0;
+    while (i < N) { j = i; while (j + 1 < N && all[ord[j + 1]] === all[ord[i]]) { j += 1; } t = j - i + 1; if (t > 1) { tieSum += t * t * t - t; } for (a = i; a <= j; a += 1) { ranks[ord[a]] = (i + j) / 2 + 1; } i = j + 1; }
+    for (i = 0; i < N; i += 1) { R[gid[i]] += ranks[i]; }
+    for (i = 0; i < k; i += 1) { H += R[i] * R[i] / n[i]; }
+    H = 12 / (N * (N + 1)) * H - 3 * (N + 1);
+    C = 1 - tieSum / (N * N * N - N);
+    if (C <= 0) { return { err: 'All values are identical. H is undefined, so the page does not report a p value.' }; }
+    Hc = H / C;
+    var res = { k: k, N: N, n: n, R: R, H: H, C: C, Hc: Hc, df: k - 1, p: chi2sf(Hc, k - 1), eta2: Math.max(0, (Hc - k + 1) / (N - k)), eps2: Hc / (N - 1), mr: R.map(function (r, ix) { return r / n[ix]; }), pairs: [] };
+    var base = N * (N + 1) / 12 - tieSum / (12 * (N - 1));
+    for (a = 0; a < k; a += 1) { for (b = a + 1; b < k; b += 1) { var se = Math.sqrt(base * (1 / n[a] + 1 / n[b])), z = (res.mr[a] - res.mr[b]) / se; res.pairs.push({ a: a, b: b, d: res.mr[a] - res.mr[b], z: z, p: normsf2(z) }); } }
+    var m = res.pairs.length, ordp = res.pairs.slice().sort(function (p, q) { return p.p - q.p; }), run = 0;
+    for (i = 0; i < m; i += 1) { run = Math.max(run, Math.min(1, (m - i) * ordp[i].p)); ordp[i].holm = run; }
+    res.desc = groups.map(function (g) { var s = g.slice().sort(function (p, q) { return p - q; }); return { med: quant(s, 0.5), q1: quant(s, 0.25), q3: quant(s, 0.75) }; });
+    return res;
+  }
+  var form = document.getElementById('kw-form'), box = document.getElementById('kw-groups'), err = document.getElementById('kw-error'), out = document.getElementById('kw-out');
+  function areas() { return [].slice.call(box.querySelectorAll('textarea')); }
+  form.addEventListener('submit', function (e) {
+    e.preventDefault(); err.textContent = ''; out.innerHTML = '';
+    var tas = areas(), groups = [], i, r;
+    tas.forEach(function (t) { t.removeAttribute('aria-invalid'); });
+    if (tas.length < 3) { err.textContent = 'Enter at least three groups. For two groups use the Mann-Whitney U test calculator.'; return; }
+    for (i = 0; i < tas.length && i < MAXG; i += 1) { r = parse(tas[i].value, i); if (r.err) { err.textContent = r.err; tas[i].setAttribute('aria-invalid', 'true'); return; } groups.push(r.v); }
+    r = compute(groups);
+    if (r.err) { err.textContent = r.err; return; }
+    var small = r.n.some(function (x) { return x < 5; });
+    var h = '<h3>Result</h3><p>Inputs used, ' + r.n.map(function (x, ix) { return 'group ' + String.fromCharCode(65 + ix) + ' n=' + x; }).join(', ') + ', N=' + r.N + '.</p>' +
+      '<div class="table-wrap"><table class="check-table"><tr><th>Statistic</th><th>Value</th></tr>' +
+      '<tr><td>H, uncorrected</td><td>' + r.H.toFixed(6) + '</td></tr><tr><td>Tie correction C</td><td>' + r.C.toFixed(6) + '</td></tr>' +
+      '<tr><td>H, tie corrected</td><td>' + r.Hc.toFixed(6) + '</td></tr><tr><td>Degrees of freedom</td><td>' + r.df + '</td></tr>' +
+      '<tr><td>p value (upper tail of chi-square)</td><td>' + fmtP(r.p) + '</td></tr>' +
+      '<tr><td>eta2[H] = (H - k + 1)/(N - k)</td><td>' + r.eta2.toFixed(4) + '</td></tr><tr><td>epsilon2 = H/(N - 1)</td><td>' + r.eps2.toFixed(4) + '</td></tr></table></div>' +
+      (small ? '<p class="mn-note">At least one group has fewer than 5 values. The chi-square approximation can be poor. This page does not compute an exact p value.</p>' : '') +
+      '<h4>Dunn pairwise comparisons, tie corrected, Holm adjusted</h4><div class="table-wrap"><table class="check-table"><tr><th>Pair</th><th>Mean rank difference</th><th>z</th><th>p</th><th>Holm p</th></tr>' +
+      r.pairs.map(function (q) { return '<tr><td>Group ' + String.fromCharCode(65 + q.a) + ' vs Group ' + String.fromCharCode(65 + q.b) + '</td><td>' + q.d.toFixed(4) + '</td><td>' + q.z.toFixed(4) + '</td><td>' + fmtP(q.p) + '</td><td>' + fmtP(q.holm) + '</td></tr>'; }).join('') + '</table></div>' +
+      '<h4>Each group</h4><div class="table-wrap"><table class="check-table"><tr><th>Group</th><th>n</th><th>Rank sum</th><th>Mean rank</th><th>Median</th><th>Q1 to Q3 (linear)</th></tr>' +
+      r.n.map(function (x, ix) { var d = r.desc[ix]; return '<tr><td>Group ' + String.fromCharCode(65 + ix) + '</td><td>' + x + '</td><td>' + fmtN(r.R[ix]) + '</td><td>' + r.mr[ix].toFixed(4) + '</td><td>' + fmtN(d.med) + '</td><td>' + fmtN(d.q1) + ' to ' + fmtN(d.q3) + '</td></tr>'; }).join('') + '</table></div>';
+    out.innerHTML = h;
+  });
+  document.getElementById('kw-add').addEventListener('click', function () {
+    var n = areas().length; if (n >= MAXG) { return; }
+    var id = 'kw-g' + (n + 1), l = document.createElement('label'), t = document.createElement('textarea');
+    l.className = 'input-label'; l.setAttribute('for', id); l.textContent = 'Group ' + String.fromCharCode(65 + n);
+    t.id = id; t.setAttribute('spellcheck', 'false'); box.appendChild(l); box.appendChild(t);
+  });
+  document.getElementById('kw-remove').addEventListener('click', function () {
+    var tas = areas(); if (tas.length <= 3) { return; }
+    var t = tas[tas.length - 1], l = box.querySelector('label[for="' + t.id + '"]'); box.removeChild(t); if (l) { box.removeChild(l); }
+  });
+}());
+</script>
+<script defer src="/assets/js/nav.js?v=45f62fb3"></script>
+</body></html>

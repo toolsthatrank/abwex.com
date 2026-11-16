@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script data-cro="sprint-20261113-ga">(function(){var w=window,d=document,n=navigator;if(!/^(www\.)?abwex\.com$/.test(location.hostname))return;w.dataLayer=w.dataLayer||[];w.gtag=w.gtag||function(){w.dataLayer.push(arguments)};var tz="";try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone||""}catch(e){}var eu=!tz||/^(Europe\/|Atlantic\/(Reykjavik|Canary|Madeira|Azores|Faroe))/.test(tz);var opt=n.globalPrivacyControl===true||n.doNotTrack==="1";gtag("consent","default",{analytics_storage:(eu||opt)?"denied":"granted"});gtag("js",new Date());gtag("config","G-K5GWQP5M49");var s=d.createElement("script");s.async=true;s.src="https://www.googletagmanager.com/gtag/js?id=G-K5GWQP5M49";(d.head||d.documentElement).appendChild(s)})();</script>
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Wilcoxon signed-rank test calculator | ABWex</title>
+ <meta name="description" content="Wilcoxon signed-rank test calculator for paired or one-sample data. Gives W+, W-, midranks, exact and tie-corrected normal p values, z and the rank-biserial r.">
+ <meta name="robots" content="index, follow">
+ <link rel="canonical" href="https://abwex.com/tools/wilcoxon-signed-rank-test-calculator/">
+ <meta property="og:title" content="Wilcoxon signed-rank test calculator">
+ <meta property="og:description" content="Free Wilcoxon signed-rank test calculator for paired or one-sample data. Get W+, W-, midranks, exact p values, z and the rank-biserial effect size.">
+ <meta property="og:url" content="https://abwex.com/tools/wilcoxon-signed-rank-test-calculator/">
+ <meta property="og:type" content="website">
+ <meta property="og:site_name" content="ABWex">
+ <meta name="twitter:card" content="summary">
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="/assets/style.css?v=67278759">
+ <style>
+/* Wilcoxon signed-rank test page. /assets/style.css does the work. These rules fill the
+   gaps for this page: two text areas, the result cards, one check table and the reading
+   rhythm. The colors, fonts and spacing values are the variables of /assets/style.css. */
+.wx .explainer-section { padding-top: 40px; }
+.wx .explainer-section h2 { margin-bottom: 16px; }
+.wx .explainer-section h3 { margin: 24px 0 8px; font-size: 1.05rem; }
+.wx .explainer-section p,
+.wx .explainer-section ul { margin-bottom: 16px; }
+.wx .explainer-section ul { padding-left: 24px; }
+.wx .explainer-section li { margin-bottom: 8px; }
+.wx .explainer-section code { font-family: var(--font-display); background: var(--bg-card); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; overflow-wrap: anywhere; }
+.wx .explainer-section a,
+.wx .last-updated a { overflow-wrap: anywhere; }
+.wx .last-updated { padding-top: 40px; }
+.wx .last-updated p + p { margin-top: 16px; }
+.wx .wx-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.wx .mode-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.wx .mode-btn { font-family: inherit; font-size: 0.9rem; padding: 8px 14px; border-radius: 6px; border: 1px solid var(--border, rgba(255,255,255,0.1)); background: var(--bg-card); color: var(--text, #e0e0e0); cursor: pointer; }
+.wx .mode-btn[aria-pressed="true"] { border-color: var(--accent, #14B8A6); color: var(--accent, #14B8A6); font-weight: 600; }
+.wx textarea {
+  width: 100%;
+  min-height: 88px;
+  background: var(--bg-input, #1a1a2e);
+  border: 1px solid var(--border, rgba(255,255,255,0.1));
+  border-radius: 6px;
+  color: var(--text, #e0e0e0);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  padding: 10px 12px;
+  resize: vertical;
+}
+.wx textarea:focus { outline: 2px solid var(--accent, #14B8A6); outline-offset: 1px; }
+.wx textarea[aria-invalid="true"] { border-color: var(--red, #EF4444); }
+.wx .input-label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.92rem; }
+.wx .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; margin-top: 18px; }
+.wx .result-card { background: var(--bg-card); border: 1px solid var(--border, rgba(255,255,255,0.1)); border-radius: 8px; padding: 14px 16px; }
+.wx .result-card .rv { font-family: var(--font-display); font-size: 1.15rem; margin: 4px 0 2px; overflow-wrap: break-word; }
+.wx .result-card .rl { font-size: 0.875rem; color: var(--text-dim, #9ca3af); }
+.wx .wx-note { font-size: 0.88rem; color: var(--text-dim, #9ca3af); margin-bottom: 12px; }
+.wx .check-table { width: 100%; border-collapse: collapse; margin: 12px 0 4px; font-size: 0.9rem; }
+.wx .check-table th, .wx .check-table td { border: 1px solid var(--border, rgba(255,255,255,0.1)); padding: 8px 10px; text-align: left; overflow-wrap: anywhere; }
+.wx .check-table th { background: var(--bg-card); font-weight: 600; }
+.wx .table-wrap { overflow-x: auto; }
+@media (max-width: 640px) { .wx .check-table { font-size: 0.875rem; } }
+.wx .wx-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.pow-strip .pow-label, .pow-strip .pow-strip-inner a { font-size: 0.75rem; }
+.wx [hidden] { display: none !important; }
+ </style>
+ <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebPage","name":"Wilcoxon signed-rank test calculator","url":"https://abwex.com/tools/wilcoxon-signed-rank-test-calculator/","author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one/about/michael-lip"},"datePublished":"2026-11-16","dateModified":"2026-11-16","description":"Wilcoxon signed-rank test calculator for paired or one-sample data, computed in the browser."},{"@type":"WebApplication","name":"ABWex Wilcoxon signed-rank test calculator","applicationCategory":"ScientificApplication","operatingSystem":"Any","url":"https://abwex.com/tools/wilcoxon-signed-rank-test-calculator/","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ABWex","item":"https://abwex.com/"},{"@type":"ListItem","position":2,"name":"Tools","item":"https://abwex.com/tools/"},{"@type":"ListItem","position":3,"name":"Wilcoxon signed-rank test calculator","item":"https://abwex.com/tools/wilcoxon-signed-rank-test-calculator/"}]},{"@type":"Person","name":"Michael Lip","url":"https://zovo.one","description":"Builder and maintainer of ABWex, part of Zovo Tools."}]}</script>
+</head>
+<body>
+ <header>
+ <div class="container header-inner">
+ <a href="/" class="logo">AB<span>Wex</span></a>
+ <button class="mobile-toggle" aria-label="Menu"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M3 6h16M3 11h16M3 16h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></button>
+ <nav>
+ <a href="/">Calculator</a>
+ <a href="/tools/" class="active">Tools</a>
+ <a href="/answers/">Answers</a>
+ <a href="/guides/">Guides</a>
+ <a href="/blog/">Blog</a>
+ <div class="nav-right">
+ <a href="https://zovo.one/pricing?utm_source=abwex&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank" rel="noopener">Go Pro </a>
+ <a href="https://zovo.one/tools?utm_source=abwex&amp;utm_medium=nav&amp;utm_campaign=tools" class="nav-zovo">Zovo Tools</a>
+ </div>
+ </nav>
+ </div>
+ </header>
+
+ <main class="container wx">
+ <section class="hero">
+ <h1>Wilcoxon <span>signed-rank test</span> calculator</h1>
+ <p>Paste paired measurements for the same subjects, or one sample of differences. The Wilcoxon signed-rank test ranks the absolute differences and sums the signed ranks. You get W+ and W−, the exact p value for small samples without ties or zeros, the normal approximation p values, the z statistic, and the matched-pairs rank-biserial effect size.</p>
+ </section>
+
+ <div class="page-answer" style="border-left:3px solid var(--accent,#14B8A6);background:rgba(20,184,166,.07);padding:14px 18px;margin:18px 0 26px;border-radius:0 6px 6px 0">
+ <p style="margin:0 0 8px">Enter the two paired columns, or a single column of differences. The calculator returns the midranks of the absolute differences, W+ (sum of positive ranks), W− (sum of negative ranks), the exact p value when there are no ties or zeros and n is at most 30, the tie-corrected asymptotic p value, the z statistic, and the matched-pairs rank-biserial correlation r = (W+ − W−)/(n(n+1)/2). On the R documentation example, the Hamilton depression scale data of Hollander and Wolfe (1973, 29f), the page gives W+ = 5, W− = 40, the exact two-sided p value 0.0390625 and the asymptotic two-sided p value 0.0382. The table below shows each value.</p>
+ <p class="updated" style="margin:0;font-size:.875rem;color:var(--text-dim,#9ca3af)">Updated 2026-11-16</p>
+ </div>
+
+ <section id="calculator" aria-labelledby="tool-h">
+ <h2 id="tool-h" class="wx-sr">Calculator</h2>
+ <form id="wx-form" novalidate>
+ <div class="card" role="group" aria-labelledby="wx-mode-h">
+ <h3 id="wx-mode-h">Data</h3>
+ <noscript><p class="wx-note">This calculator runs on JavaScript, which is turned off in this browser. The explanations and the check table below do not need it.</p></noscript>
+ <div class="mode-row" role="group" aria-label="Input mode">
+ <button type="button" class="mode-btn" id="wx-mode-paired" aria-pressed="true">Paired columns</button>
+ <button type="button" class="mode-btn" id="wx-mode-diff" aria-pressed="false">One sample of differences</button>
+ </div>
+ <p class="wx-note" id="wx-hint">In paired mode the two boxes must hold the same number of values in the same order, because value 1 of Group 1 pairs with value 1 of Group 2. The page uses the differences Group 2 minus Group 1 (after minus before). Separate the values with spaces, line breaks, semicolons or a comma and a space. Enter whole or decimal numbers from -1000000000 to 1000000000, with a point as the decimal mark. The page rejects a comma between two digits, such as 1,250 or 28,50, because it cannot tell a thousands separator from a decimal comma.</p>
+ <div class="input-group">
+ <div class="input-field"><label class="input-label" for="wx-a">Group 1 (before / x)</label><textarea id="wx-a" spellcheck="false" aria-describedby="wx-hint" placeholder="1.83, 0.50, 1.62, 2.48, 1.68, 1.88, 1.55, 3.06, 1.30"></textarea></div>
+ <div class="input-field"><label class="input-label" for="wx-b">Group 2 (after / y)</label><textarea id="wx-b" spellcheck="false" aria-describedby="wx-hint" placeholder="0.878, 0.647, 0.598, 2.05, 1.06, 1.29, 1.06, 3.14, 1.29"></textarea></div>
+ </div>
+ <div class="input-field" id="wx-diff-wrap" hidden><label class="input-label" for="wx-d">Differences</label><textarea id="wx-d" spellcheck="false" aria-describedby="wx-hint" placeholder="-0.952, 0.147, -1.022, -0.43, -0.62, -0.59, -0.49, 0.08, -0.01"></textarea></div>
+ <div class="wx-actions">
+ <button type="submit" id="wx-calc" class="btn btn-primary" disabled>Calculate</button>
+ <button type="button" id="wx-example" class="btn btn-secondary wx-load" data-example="r" disabled>Load the R example</button>
+ <button type="button" id="wx-zeros" class="btn btn-secondary wx-load" data-example="zeros" disabled>Load a zeros example</button>
+ <button type="button" id="wx-ties" class="btn btn-secondary wx-load" data-example="ties" disabled>Load a ties example</button>
+ <button type="button" id="wx-clear" class="btn btn-secondary" disabled>Clear</button>
+ </div>
+ </div>
+ </form>
+ <div id="wx-error" class="sig-red" role="alert"></div>
+ <p id="wx-status" class="wx-sr" role="status"></p>
+ <div id="wx-out" aria-live="polite"></div>
+ </section>
+
+ <section class="explainer-section" id="check-example">
+ <h2>The R documentation example</h2>
+ <p>The example data come from the R manual for <code>wilcox.test</code>: the Hamilton depression scale factor measurements in 9 patients with mixed anxiety and depression, taken at the first (x) and second (y) visit after initiation of a therapy. The example is Hollander and Wolfe (1973), 29f. R runs <code>wilcox.test(x, y, paired = TRUE, alternative = "greater")</code> and <code>wilcox.test(y - x, alternative = "less")</code>, and marks the second call as the same test. R defines V as the sum of the ranks of the positive differences, so V = 40 for x − y and V = 5 for y − x. The table compares the page output with SciPy 1.13.1, with the R definition of V and with an exact enumeration. <a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/wilcox.test.html" rel="noopener">R manual, wilcox.test</a>.</p>
+ <div class="table-wrap">
+ <table class="check-table">
+ <caption class="wx-sr">Page output versus R and exact enumeration for the documentation example</caption>
+ <thead><tr><th scope="col">Quantity</th><th scope="col">This page</th><th scope="col">Reference</th></tr></thead>
+ <tbody>
+ <tr><td>W+ (sum of positive ranks of y − x)</td><td>5</td><td>V = 5, the statistic of <code>wilcox.test(y - x, alternative = "less")</code>, which sums the ranks of the positive values of y − x</td></tr>
+ <tr><td>W− (sum of negative ranks of y − x)</td><td>40</td><td>V = 40, the statistic of <code>wilcox.test(x, y, paired = TRUE)</code>, which sums the ranks of the positive values of x − y</td></tr>
+ <tr><td>p, exact two-sided</td><td>0.0390625</td><td>0.0390625 (SciPy 1.13.1 <code>wilcoxon(x, y)</code> and a full enumeration of all 512 sign assignments)</td></tr>
+ <tr><td>p, exact one-sided, y − x tends to be negative</td><td>Not shown (the page gives two-sided p values only)</td><td>0.01953125 (SciPy <code>wilcoxon(y, x, alternative = "less")</code>)</td></tr>
+ <tr><td>p, asymptotic two-sided</td><td>0.038152</td><td>0.038151710173415135 (SciPy <code>wilcoxon(d, method = "approx")</code>)</td></tr>
+ <tr><td>z statistic</td><td>−2.073221</td><td>z = (W+ − 22.5)/8.440972 = −2.073221</td></tr>
+ <tr><td>Matched-pairs rank-biserial r</td><td>−0.777778</td><td>(5 − 40)/45</td></tr>
+ </tbody>
+ </table>
+ </div>
+ <p>With n = 9 pairs and no zeros there are 2⁹ = 512 sign assignments of the ranks 1 to 9. The differences y − x are −0.952, 0.147, −1.022, −0.43, −0.62, −0.59, −0.49, 0.08, −0.01, so the absolute differences rank to 8, 3, 9, 4, 7, 6, 5, 2, 1. Only the ranks 2 and 3 add up on the positive side: W+ = 2 + 3 = 5. The two-sided exact p value counts the assignments with W+ ≤ 5 or W+ ≥ 40: 10 + 10 of 512, which is 20/512 = 0.0390625.</p>
+ </section>
+
+ <section class="explainer-section" id="zeros-ties">
+ <h2>Zeros and ties, and what R and SciPy do</h2>
+ <ul>
+ <li>Differences equal to zero carry no sign. This page drops them and reduces n accordingly, as SciPy does with the default <code>zero_method="wilcox"</code>. R changed this in version 4.6.0. Its <a href="https://github.com/wch/r-source/blob/trunk/src/library/stats/R/wilcox.test.R" rel="noopener">source code</a> says "In R &lt; 4.6.0, we always removed zeros" and "Follow Pratt rather than Wilcoxon and do not remove zeros", so R can give a different p value when there are zeros. R says the Wilcoxon signed rank test is of "the null that the distribution of x (in the one sample case) or of x − y (in the paired two sample case) is symmetric about mu".</li>
+ <li>Equal absolute differences get the average (mid) rank. The W statistic uses these mid ranks.</li>
+ <li>With ties or dropped zeros present, this page does not calculate the exact p value. It computes the exact p value only when all differences are nonzero and no absolute difference occurs more than once and n is at most 30. With ties or zeros, it shows only the tie-corrected asymptotic p values and says so.</li>
+ <li>R-devel does something different: "If there are ties, exact inference is performed using the conditional/permutation distribution given the observed ranks, using an implementation of the Streitberg–Röhmel shift algorithm". R also notes that "an exact p-value is computed if the samples contain less than 50 finite values". This page does not do that permutation calculation. <a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/wilcox.test.html" rel="noopener">R manual, wilcox.test</a>.</li>
+ <li>SciPy's default <code>zero_method="wilcox"</code> "Discards all zero-differences"; <code>zero_method="pratt"</code> "Includes zero-differences in the ranking process, but drops the ranks of the zeros", and <code>zero_method="zsplit"</code> splits the zero ranks between positive and negative. This page follows the "wilcox" behavior. <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.wilcoxon.html" rel="noopener">SciPy manual, scipy.stats.wilcoxon</a>.</li>
+ </ul>
+ </section>
+
+ <section class="explainer-section" id="effect">
+ <h2>Effect size, the matched-pairs rank-biserial correlation</h2>
+ <p>Alongside the p value the page reports the matched-pairs rank-biserial correlation r = (W+ − W−)/(n(n+1)/2), which runs from −1 (every difference is negative) to +1 (every difference is positive). For the R example r = (5 − 40)/45 = −0.777778. Most of the rank weight is on the pairs where the second-visit value (y) is lower than the first-visit value (x). Kerby (2014, Comprehensive Psychology, volume 3, doi 10.2466/11.IT.3.1) calls this computation "the simple difference formula", and the <a href="https://en.wikipedia.org/wiki/Wilcoxon_signed-rank_test" rel="noopener">Wikipedia article on the Wilcoxon signed-rank test</a> uses it as the effect size for this test.</p>
+ <p>The calculator prints the midranks of the absolute differences with every result, so you can verify the rank assignment by hand before you trust the p values.</p>
+ </section>
+
+ <section class="explainer-section" id="when">
+ <h2>Wilcoxon signed-rank or the paired t test?</h2>
+ <p>The SciPy manual calls the Wilcoxon signed-rank test "a non-parametric version of the paired T-test". For the paired t test itself, use the paired mode of the ABWex <a href="/tools/t-test-calculator/">t-test calculator</a>. The <a href="https://en.wikipedia.org/wiki/Wilcoxon_signed-rank_test" rel="noopener">Wikipedia article</a> compares the test with the sign test: "The Wilcoxon test is a more powerful alternative to the sign test because it considers the magnitude of the differences, but it requires this moderately strong assumption of symmetry." Do not confuse this test with the Wilcoxon rank-sum test. The R manual runs the rank-sum test when x and y are given and paired is FALSE, and calls it "equivalent to the Mann-Whitney test". It is for two independent samples. The SciPy manual lists <code>scipy.stats.mannwhitneyu</code> under "See also", and ABWex offers the <a href="/tools/mann-whitney-u-test-calculator/">Mann-Whitney U test calculator</a> for that case.</p>
+ </section>
+
+ <section class="explainer-section" id="limits">
+ <h2>Limits and accuracy</h2>
+ <ul>
+ <li>The page calculates the exact p value with dynamic programming over the signed-rank distribution. It shows the exact p value only when there are no zeros and no ties and n is at most 30. The two-sided exact p value is 2 × P(W ≥ max(W+, W−)), with a maximum of 1.</li>
+ <li>The asymptotic p values use the tie-corrected standard deviation σ² = n(n+1)(2n+1)/24 − Σ(t³ − t)/48, where t is the size of each group of equal absolute differences, and the normal distribution. z = (W+ − n(n+1)/4)/σ. The page shows two normal p values. The first has no continuity correction, as <code>scipy.stats.wilcoxon(method="approx")</code> with its default <code>correction=False</code>. The second moves |W+ − n(n+1)/4| by 0.5 toward 0, but not below 0, as SciPy does with <code>correction=True</code>.</li>
+ <li>Values from −1,000,000,000 to 1,000,000,000 are accepted, with up to 10,000 values. The page sets its own exact limit of n = 30. SciPy uses the exact method when len(d) &lt;= 50, and R when the sample has less than 50 finite values, so for n from 31 to 50 SciPy and R can report an exact p value where this page reports the normal approximation. The calculation runs in your browser and makes no network request.</li>
+ <li>In paired mode the page rounds each difference at the 13th significant digit of the larger of the two values before it ranks. Thus 0.050000000000000044 and 0.05 get the same rank, and 123456789.0123 and 123456789.0124 keep different ranks. The SciPy manual warns that roundoff in x - y can give different ranks to values that are tied. The page rounds the rank sums, z, the rank-biserial r and the p values to 12 significant digits. A normal p value below 1e-300 is shown as "less than 1e-300".</li>
+ </ul>
+ </section>
+
+ <section class="explainer-section">
+ <h2>Disclaimers</h2>
+ <ul>
+ <li>Results are statistical estimates and not medical, business or financial advice.</li>
+ <li>The reference example is the published R documentation example, and it names its source. The "Load a zeros example" and "Load a ties example" buttons load made-up values that only show how the page handles zeros and ties. They are not real measurements.</li>
+ </ul>
+ </section>
+
+ <div class="last-updated">
+ <p>By Michael Lip, builder and maintainer of ABWex, open source at <a href="https://github.com/theluckystrike/abwex.com">github.com/theluckystrike/abwex.com</a>. <a href="https://zovo.one">Profile</a>.</p>
+ <p>ABWex is a free A/B test statistics calculator from Zovo Tools. The calculation runs in your browser in JavaScript. The page does not send the numbers that you enter to a server. Published 2026-11-16.</p>
+ </div>
+
+  <!-- Internal Content Discovery -->
+ <section class="content-discovery" style="max-width:960px;margin:3rem auto;padding:0 1rem;">
+ <style>
+        .content-discovery h2 { text-align:center; margin-bottom:2rem; }
+        .content-discovery .disc-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:2rem; margin-bottom:2.5rem; }
+        .content-discovery .disc-group h3 { font-size:1.1rem; margin-bottom:0.75rem; color:var(--accent, #14B8A6); border-bottom:1px solid var(--border, #333); padding-bottom:0.5rem; }
+        .content-discovery .disc-group ul { list-style:none; padding:0; margin:0; }
+        .content-discovery .disc-group li { margin-bottom:0.4rem; }
+        .content-discovery .disc-group a { color:var(--text, #e0e0e0); text-decoration:none; font-size:0.9rem; }
+        .content-discovery .disc-group a:hover { color:var(--accent, #14B8A6); text-decoration:underline; }
+      </style>
+ <h2>Explore ABWex</h2>
+ <div class="disc-grid">
+ <div class="disc-group">
+ <h3>Testing Tools</h3>
+ <ul>
+ <li><a href="/tools/sample-size-calculator.html">Sample Size Calculator</a></li>
+ <li><a href="/tools/p-value-calculator.html">P-Value Calculator</a></li>
+ <li><a href="/tools/chi-square-test.html">Chi-Square Test</a></li>
+ <li><a href="/tools/confidence-interval-calculator.html">Confidence Interval Calculator</a></li>
+ <li><a href="/tools/bayesian-ab-testing.html">Bayesian A/B Testing</a></li>
+ </ul>
+ </div>
+ <div class="disc-group">
+ <h3>Answers</h3>
+ <ul>
+ <li><a href="/answers/ab-test-sample-size-calculator.html">A/B Test Sample Size Calculator</a></li>
+ <li><a href="/answers/is-my-ab-test-significant.html">Is My A/B Test Significant?</a></li>
+ <li><a href="/answers/how-long-to-run-ab-test.html">How Long to Run an A/B Test</a></li>
+ </ul>
+ </div>
+ <div class="disc-group">
+ <h3>Research</h3>
+ <ul>
+ <li><a href="/research/ab-test-duration-calculator.html">A/B Test Duration Calculator</a></li>
+ <li><a href="/research/ab-test-mistakes.html">A/B Test Mistakes</a></li>
+ </ul>
+ </div>
+ <div class="disc-group">
+ <h3>Guides</h3>
+ <ul>
+ <li><a href="/guides/chi-square-test-guide.html">Chi-Square Test Explained</a></li>
+ </ul>
+ </div>
+ </div>
+ </section>
+ </main>
+<aside class="l2o" data-cro="sprint-20261113-offer" data-offer="abwex-exact-test-kit" aria-label="Exact Test Report Kit"><style>.l2o{max-width:760px;margin:32px auto;padding:18px 20px;border:2px solid rgba(37,99,235,.45);border-radius:12px;background:rgba(37,99,235,.06);box-sizing:border-box;font-family:inherit;line-height:1.5}.l2o *{box-sizing:border-box}.l2o-k{margin:0 0 4px;font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;opacity:.75}.l2o h2{margin:0 0 8px;font-size:1.2rem;line-height:1.3}.l2o p{margin:0 0 12px}.l2o-btn{display:inline-flex;align-items:center;min-height:46px;padding:0 18px;border:0;border-radius:8px;background:#2563eb;color:#fff!important;font-weight:700;font-size:1rem;text-decoration:none;cursor:pointer}.l2o-btn:hover{background:#1d4ed8}.l2o form{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}.l2o input[type=email]{flex:1 1 220px;min-height:46px;padding:0 12px;border:1px solid rgba(127,127,127,.6);border-radius:8px;font-size:1rem;background:#fff;color:#111}.l2o-hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;overflow:hidden}.l2o-n{font-size:.85rem;opacity:.75;margin:0!important}.l2o-m{font-weight:700;margin:0 0 8px!important}@media (max-width:600px){.l2o{margin:24px 12px;padding:16px}}</style><div data-cro="sprint-20261115-abwex-kit-buy"><p class="l2o-k">Report kit &middot; $19</p><h2>Exact Test Report Kit: run the Fisher-Freeman-Halton test in Python and report it right</h2><p>A Python script (standard library only, no SciPy, no R) for the Fisher-Freeman-Halton exact test on any R&times;C table: exact p-value with exact fractions, Monte Carlo for big tables, pairwise tests with Holm correction, Cramer&#x27;s V and the chi-square comparison. It fills a report template that explains why the exact test was used and what the result does and does not mean. Includes a worked 3&times;3 example and a self-test that reproduces the reference p-values on this site. Not a replacement for SPSS or Prism; it does one job well.</p><p><a class="l2o-btn" href="https://buy.stripe.com/14A5kEd2O2Bq1xzc3343S3N" data-l2o-cta="1" data-checkout="1" rel="noopener">Get the report kit &mdash; $19</a></p><p class="l2o-n">One payment through Stripe, no account. Zip download right after payment. Python 3.8+ on Windows, macOS or Linux.</p></div></aside>
+<footer class="site-footer">
+ <div class="footer-inner">
+ <div class="footer-brand">Zovo Tools</div>
+ <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+ <a href="https://zovo.one/pricing?utm_source=abwex&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime, $99 once</a>
+ <div class="footer-copy">© 2026 <a href="https://zovo.one/lifetime?utm_source=abwex&amp;utm_medium=footer&amp;utm_campaign=tools">Zovo</a></div>
+ </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+ <div class="zovo-network-inner">
+ <h3 class="zovo-network-title">Explore More Tools</h3>
+ <div class="zovo-network-links">
+ <a href="https://b2berp.com">B2BERP, Business Tools</a>
+ <a href="https://bugbountyreality.com">BugBountyReality, Security</a>
+ <a href="https://claudflow.com">ClaudFlow, Workflows</a>
+ <a href="https://claudkit.com">ClaudKit, API Tools</a>
+ <a href="https://dismissticket.com">DismissTicket, Support</a>
+ <a href="https://enhio.com">Enhio, Text Tools</a>
+ <a href="https://epochpilot.com">EpochPilot, Timestamps</a>
+ <a href="https://gen8x.com">Gen8X, Color Tools</a>
+ <a href="https://gpt0x.com">GPT0X, AI Models</a>
+ <a href="https://heytensor.com">HeyTensor, ML Tools</a>
+ <a href="https://ingredientcalculator.com">IngredientCalc, Recipes</a>
+ <a href="https://invokebot.com">InvokeBot, Webhooks</a>
+ <a href="https://kappafy.com">Kappafy, JSON</a>
+ <a href="https://kappakit.com">KappaKit, Dev Toolkit</a>
+ <a href="https://kickllm.com">KickLLM, LLM Costs</a>
+ <a href="https://krzen.com">Krzen, Image Tools</a>
+ <a href="https://lochbot.com">LochBot, Security</a>
+ <a href="https://lockml.com">LockML, ML Security</a>
+ <a href="https://ml0x.com?utm_source=abwex&amp;utm_medium=nav&amp;utm_campaign=tools">ML0X, ML Basics</a>
+ <a href="https://ml3x.com">ML3X, Matrix Math</a>
+ <a href="https://pictureeditor.net">PictureEditor, Image Editing</a>
+ <a href="https://recipetool.net">RecipeTool, Cooking</a>
+ <a href="https://viryd.com">Viryd, Dev Tools</a>
+ <a href="https://tg.zovo.one/">Tiny Telegram Tools, Telegram Bots</a>
+ </div>
+ </div>
+</nav>
+
+<div class="pow-strip">
+ <div class="pow-strip-inner">
+ <span class="pow-label" style="font-size:0.75rem">By the same builder:</span>
+ <a href="https://github.com/theluckystrike" rel="nofollow" style="font-size:0.75rem">GitHub, theluckystrike</a>
+ <a href="https://www.belikenative.com" rel="nofollow" style="font-size:0.75rem">BeLikeNative, Grammar AI</a>
+ <a href="https://earlythunder.com" rel="nofollow" style="font-size:0.75rem">EarlyThunder, Dev Blog</a>
+ <a href="https://bugbountyreality.com" rel="nofollow" style="font-size:0.75rem">Bug Bounty Reality</a>
+ <a href="https://zovo.one/lifetime?utm_source=abwex&amp;utm_medium=inline&amp;utm_campaign=tools" rel="nofollow" style="font-size:0.75rem">Zovo, AI Dev Tools</a>
+ </div>
+</div>
+
+<script>
+/* ABWex Wilcoxon signed-rank test calculator. MIT licensed, github.com/theluckystrike/abwex.com.
+   The script reads paired columns or a single sample of differences and writes the result.
+   It makes no network request.
+   Exact p: dynamic programming over the signed-rank distribution (no ties, no zeros, n<=30).
+   Asymptotic p: tie-corrected normal approximation, with and without the 0.5 continuity
+   correction, with the same formula as scipy.stats.wilcoxon(method="approx").
+   Each loop has a fixed upper limit. No recursion. */
+(function () {
+  "use strict";
+  var MAX_ABS = 1000000000;
+  var MAX_VALUES = 10000;
+  var EXACT_MAX_N = 30;
+
+  var EXAMPLES = {
+    r: { paired: true, a: "1.83, 0.50, 1.62, 2.48, 1.68, 1.88, 1.55, 3.06, 1.30", b: "0.878, 0.647, 0.598, 2.05, 1.06, 1.29, 1.06, 3.14, 1.29" },
+    zeros: { paired: true, a: "12, 15, 9, 20, 14, 18, 11, 16", b: "12, 17, 9, 24, 14, 15, 10, 22" },
+    ties: { paired: true, a: "5, 7, 9, 4, 8, 6, 10, 3", b: "6, 6, 11, 2, 7, 8, 9, 6" }
+  };
+
+  var form = document.getElementById("wx-form");
+  var outBox = document.getElementById("wx-out");
+  var errorBox = document.getElementById("wx-error");
+  var statusBox = document.getElementById("wx-status");
+  var boxA = document.getElementById("wx-a");
+  var boxB = document.getElementById("wx-b");
+  var boxD = document.getElementById("wx-d");
+  var diffWrap = document.getElementById("wx-diff-wrap");
+  var groupWrap = boxA.parentNode.parentNode;
+  var pairedMode = true;
+
+  function node(tag, className, text) {
+    var el = document.createElement(tag);
+    if (className) { el.className = className; }
+    if (text !== undefined && text !== null) { el.textContent = text; }
+    return el;
+  }
+  function empty(el) { while (el.firstChild) { el.removeChild(el.firstChild); } }
+
+  // Parse one pasted sample into an array of numbers. Returns {values, problem}.
+  function parseSample(text) {
+    var parts = text.trim().split(/[\s,;]+/).filter(function (p) { return p !== ""; });
+    var values = [];
+    var j;
+    if (/\d,\d/.test(text)) { return { values: null, problem: "a comma stands between two digits, for example 1,250 or 28,50. Use a point as the decimal mark, write no thousands separators, and put a space after each comma." }; }
+    if (parts.length === 0) { return { values: [], problem: "empty" }; }
+    if (parts.length > MAX_VALUES) { return { values: null, problem: "too many values. The limit is " + MAX_VALUES + "." }; }
+    for (j = 0; j < parts.length; j += 1) {
+      var raw = parts[j];
+      var num = Number(raw);
+      if (!/^([+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?)$/.test(raw.trim()) || !isFinite(num)) { return { values: null, problem: "the value \"" + (raw.length > 20 ? raw.slice(0, 20) + "…" : raw) + "\" is not a number." }; }
+      if (Math.abs(num) > MAX_ABS) { return { values: null, problem: "the value " + (raw.length > 20 ? raw.slice(0, 20) + "…" : raw) + " is outside the range -1,000,000,000 to 1,000,000,000." }; }
+      values.push(num);
+    }
+    return { values: values, problem: null };
+  }
+
+  // Round y - x at the 13th significant digit of the larger of x and y. Roundoff in y - x is
+  // far below this step, so tied differences stay tied and different inputs stay different.
+  function roundDiff(x, y) {
+    var d = y - x;
+    var big = Math.max(Math.abs(x), Math.abs(y));
+    var p;
+    if (d === 0 || big === 0) { return 0; }
+    p = 13 + Math.floor(Math.log10(Math.abs(d))) - Math.floor(Math.log10(big));
+    if (p < 1) { return 0; }
+    return Number(d.toPrecision(Math.min(p, 100)));
+  }
+
+  function problemText(label, state) {
+    if (state === "empty") { return "The box " + label + " is empty. The test needs at least 1 difference."; }
+    return label + ": " + state;
+  }
+
+  // ----- mathematics -----
+
+  // Mid ranks of the absolute differences (average ranks for ties).
+  function midRanks(values) {
+    var n = values.length;
+    var order = values.map(function (v, idx) { return idx; });
+    order.sort(function (x, y) { return values[x] - values[y]; });
+    var ranks = new Array(n);
+    var k = 0;
+    while (k < n) {
+      var m = k;
+      while (m + 1 < n && values[order[m + 1]] === values[order[k]]) { m += 1; }
+      var avg = (k + m) / 2 + 1;
+      var j;
+      for (j = k; j <= m; j += 1) { ranks[order[j]] = avg; }
+      k = m + 1;
+    }
+    return ranks;
+  }
+
+  // Normal two-sided p from z, via erfc.
+  function erfSeries(x) {
+    var x2 = x * x;
+    var term = x;
+    var sum = x;
+    var n;
+    for (n = 1; n <= 200; n += 1) {
+      term = term * 2 * x2 / (2 * n + 1);
+      sum += term;
+      if (term < sum * 1e-17) { break; }
+    }
+    return 2 / Math.sqrt(Math.PI) * Math.exp(-x2) * sum;
+  }
+  function erfcFraction(x) {
+    var f = x;
+    var k;
+    for (k = 200; k >= 1; k -= 1) { f = x + (k / 2) / f; }
+    return Math.exp(-x * x) / (Math.sqrt(Math.PI) * f);
+  }
+  function erfc(x) {
+    if (typeof x !== "number" || !(x >= 0)) { return 1; }
+    return x < 2.5 ? 1 - erfSeries(x) : erfcFraction(x);
+  }
+  function twoSidedNormalP(z) {
+    return Math.min(1, erfc(Math.abs(z) / Math.SQRT2));
+  }
+
+  // Exact two-sided p, no ties and no zeros. dp[j][s] counts the sign assignments of the
+  // first j ranks that make the sum of the positive ranks equal to s, stored as a count of
+  // assignments out of 2^j. Returns min(1, 2 * P(S >= W+)) counting both tails exactly.
+  function exactTwoSidedP(ranks, wp, wm, n) {
+    var half = n * (n + 1) / 2;
+    var dp = [], j, s, c1, c2;
+    for (j = 0; j <= n; j += 1) { dp.push(new Float64Array(half + 1)); }
+    dp[0][0] = 1;
+    for (j = 0; j < n; j += 1) {
+      for (s = 0; s <= half; s += 1) {
+        if (dp[j][s] === 0) { continue; }
+        c1 = s + ranks[j];
+        if (c1 <= half) { dp[j + 1][c1] += dp[j][s]; }
+        dp[j + 1][s] += dp[j][s];
+      }
+    }
+    var tail = 0;
+    var big = Math.max(wp, wm);
+    for (s = Math.ceil(big - 1e-9); s <= half; s += 1) { tail += dp[n][s]; }
+    return Math.min(1, 2 * tail / Math.pow(2, n));
+  }
+
+  function fmt(x) {
+    return String(Number(x.toPrecision(12)));
+  }
+  function fmtP(p) {
+    return p < 1e-300 ? "less than 1e-300" : fmt(p);
+  }
+
+  function showResult(diffs) {
+    empty(outBox);
+    // drop zeros, keep the order (SciPy zero_method="wilcox")
+    var kept = [], j;
+    var zeros = 0;
+    for (j = 0; j < diffs.length; j += 1) {
+      if (diffs[j] === 0) { zeros += 1; } else { kept.push(diffs[j]); }
+    }
+    var n = kept.length;
+    if (n === 0) {
+      outBox.appendChild(node("p", "wx-note", "Every difference is zero, so the test is not defined. The page shows no result."));
+      return;
+    }
+    var absd = kept.map(Math.abs);
+    var ranks = midRanks(absd);
+    var wp = 0, wm = 0;
+    for (j = 0; j < n; j += 1) {
+      if (kept[j] > 0) { wp += ranks[j]; } else { wm += ranks[j]; }
+    }
+    var half = n * (n + 1) / 2;
+    var mu = n * (n + 1) / 4;
+
+    // tie correction
+    var counts = {};
+    for (j = 0; j < n; j += 1) {
+      var key = absd[j];
+      counts[key] = (counts[key] || 0) + 1;
+    }
+    var ties = [], hasTies = false;
+    var keys = Object.keys(counts);
+    for (j = 0; j < keys.length; j += 1) {
+      var t = counts[keys[j]];
+      if (t > 1) { ties.push(t); hasTies = true; }
+    }
+    var tieTerm = 0;
+    for (j = 0; j < ties.length; j += 1) { tieTerm += ties[j] * ties[j] * ties[j] - ties[j]; }
+    var sigma2 = n * (n + 1) * (2 * n + 1) / 24 - tieTerm / 48;
+    var sigma = Math.sqrt(sigma2);
+
+    var grid = node("div", "result-grid");
+    function card(label, value) {
+      var c = node("div", "result-card");
+      c.appendChild(node("div", "rl", label));
+      c.appendChild(node("div", "rv", value));
+      grid.appendChild(c);
+    }
+    card("n (pairs used, zeros dropped)", fmt(n));
+    if (zeros > 0) { card("Zeros dropped", fmt(zeros)); }
+    card("W+ (positive ranks)", fmt(wp));
+    card("W− (negative ranks)", fmt(wm));
+    card("Rank-biserial r, (W+ − W−)/(n(n+1)/2)", fmt((wp - wm) / half));
+
+    var pExact = null;
+    if (!hasTies && zeros === 0 && n <= EXACT_MAX_N) { pExact = exactTwoSidedP(ranks, wp, wm, n); }
+    if (pExact !== null) { card("p, exact two-sided", fmtP(pExact)); }
+    if (sigma > 0) {
+      card("z statistic", fmt((wp - mu) / sigma));
+      card("p, asymptotic two-sided (no continuity correction)", fmtP(twoSidedNormalP((wp - mu) / sigma)));
+      card("p, asymptotic two-sided (continuity correction)", fmtP(twoSidedNormalP(Math.max(0, Math.abs(wp - mu) - 0.5) / sigma)));
+    }
+    outBox.appendChild(grid);
+    outBox.appendChild(node("p", "wx-note", "Midranks of the absolute differences: " + ranks.join(", ") + "."));
+
+    var notes = [];
+    if (zeros > 0) {
+      notes.push("The differences contain " + zeros + " zero" + (zeros === 1 ? "" : "s") + ". Zeros are dropped and n is reduced, following SciPy zero_method=\"wilcox\". The page does not calculate the exact p value when zeros are present.");
+    }
+    if (hasTies) {
+      notes.push("The absolute differences contain equal values (ties). The page does not calculate the exact p value when there are ties. The asymptotic p values above use the tie-corrected variance.");
+    } else if (zeros === 0 && n > EXACT_MAX_N) {
+      notes.push("n is " + n + ", above the exact limit of " + EXACT_MAX_N + ". The page shows the asymptotic p values only.");
+    }
+    if (sigma === 0) {
+      notes.push("All differences have equal absolute value, so the asymptotic test is not defined. The page shows no asymptotic p value.");
+    }
+    for (j = 0; j < notes.length; j += 1) { outBox.appendChild(node("p", "wx-note", notes[j])); }
+  }
+
+  // strict = true after Calculate: missing input is a problem. strict = false while the
+  // reader types: an empty box only removes the result.
+  function update(strict) {
+    var diffs = null;
+    var problems = [];
+    var incomplete = false;
+    var firstBad = null;
+    var j;
+    if (pairedMode) {
+      var pa = parseSample(boxA.value);
+      var pb = parseSample(boxB.value);
+      var parsed = [pa, pb];
+      var boxes = [boxA, boxB];
+      var labels = ["Group 1", "Group 2"];
+      for (j = 0; j < 2; j += 1) {
+        if (parsed[j].problem === null) {
+          boxes[j].removeAttribute("aria-invalid");
+        } else if (parsed[j].problem === "empty" && !strict) {
+          boxes[j].removeAttribute("aria-invalid");
+          incomplete = true;
+        } else {
+          var msg = problemText(labels[j], parsed[j].problem);
+          problems.push(msg);
+          boxes[j].setAttribute("aria-invalid", "true");
+          firstBad = firstBad || boxes[j];
+        }
+      }
+      if (problems.length === 0 && !incomplete) {
+        if (pa.values.length !== pb.values.length) {
+          problems.push("The two columns hold " + pa.values.length + " and " + pb.values.length + " values. Paired mode needs the same number in both.");
+          boxA.setAttribute("aria-invalid", "true");
+          boxB.setAttribute("aria-invalid", "true");
+          firstBad = firstBad || boxA;
+        } else {
+          diffs = [];
+          for (j = 0; j < pa.values.length; j += 1) { diffs.push(roundDiff(pa.values[j], pb.values[j])); }
+        }
+      }
+    } else {
+      var pd = parseSample(boxD.value);
+      if (pd.problem === null) {
+        boxD.removeAttribute("aria-invalid");
+        diffs = pd.values;
+      } else if (pd.problem === "empty" && !strict) {
+        boxD.removeAttribute("aria-invalid");
+        incomplete = true;
+      } else {
+        problems.push(problemText("Differences", pd.problem));
+        boxD.setAttribute("aria-invalid", "true");
+        firstBad = firstBad || boxD;
+      }
+    }
+    empty(errorBox);
+    statusBox.textContent = "";
+    if (problems.length > 0) {
+      empty(outBox);
+      for (j = 0; j < problems.length; j += 1) { errorBox.appendChild(node("p", "", problems[j])); }
+      return firstBad;
+    }
+    if (incomplete) { empty(outBox); return null; }
+    showResult(diffs);
+    statusBox.textContent = "Result updated.";
+    return null;
+  }
+
+  function loadExample(key) {
+    var ex = EXAMPLES[key];
+    if (!ex) { return; }
+    setMode(ex.paired);
+    if (ex.paired) {
+      boxA.value = ex.a;
+      boxB.value = ex.b;
+    } else {
+      boxD.value = ex.d;
+    }
+    update(true);
+    form.scrollIntoView({ block: "start" });
+  }
+
+  function setMode(paired) {
+    pairedMode = paired;
+    document.getElementById("wx-mode-paired").setAttribute("aria-pressed", String(paired));
+    document.getElementById("wx-mode-diff").setAttribute("aria-pressed", String(!paired));
+    diffWrap.hidden = !paired ? false : true;
+    groupWrap.hidden = paired ? false : true;
+    update(false);
+  }
+
+  function clearAll() {
+    boxA.value = "";
+    boxB.value = "";
+    boxD.value = "";
+    update(false);
+    (pairedMode ? boxA : boxD).focus();
+  }
+
+  form.addEventListener("submit", function (event) {
+    var bad;
+    event.preventDefault();
+    bad = update(true);
+    if (bad) { bad.focus(); }
+  });
+  form.addEventListener("input", function () { update(false); });
+  document.getElementById("wx-clear").addEventListener("click", clearAll);
+  document.getElementById("wx-mode-paired").addEventListener("click", function () { setMode(true); });
+  document.getElementById("wx-mode-diff").addEventListener("click", function () { setMode(false); });
+  document.addEventListener("click", function (event) {
+    var target = event.target;
+    var button = target && target.closest ? target.closest(".wx-load") : null;
+    if (button) { loadExample(button.getAttribute("data-example")); }
+  });
+  // After the Back button the browser can restore the page or the field values.
+  // The result is calculated again from the fields, so the two always agree.
+  window.addEventListener("pageshow", function () { update(false); });
+
+  var buttons = document.querySelectorAll("#wx-form button, .wx-load");
+  var i;
+  for (i = 0; i < buttons.length && i < 20; i += 1) { buttons[i].disabled = false; }
+  setMode(true);
+}());
+</script>
+<script defer src="/assets/js/nav.js?v=45f62fb3"></script>
+</body>
+</html>
